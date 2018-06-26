@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>贝塞尔曲线</title>
+    <link rel="stylesheet" href="../libs/leaflet/leaflet.css">
+    <script src="../libs/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../libs/leaflet/leaflet.js"></script>
+    <script src="../libs/leaflet/leaflet.curve.js"></script>
+    <script src="../libs/util/bezierjs.js"></script>
+    <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    var map = L.map('map', {
+        center: [30.443161028658903, 114.43944096565248],
+        zoom: 17
+    });
+    // 添加osm为底图
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    map.on("click", function (event) {
+        console.log(event.latlng);
+    });
+
+    // 点
+    var points = [
+        {lat: 30.44428023295041, lng: 114.43701624870302},
+        {lat: 30.44156082169274, lng: 114.44191932678223},
+        {lat: 30.437185555280553, lng: 114.44245576858522},
+        {lat: 30.438055074173445, lng: 114.43763852119447},
+        {lat: 30.441459073540894, lng: 114.43385124206544}
+    ];
+
+    var command = [];
+    for (var i = 0; i < points.length; i++) {
+        L.marker(points[i]).addTo(map);
+        if (i == 0) {
+            command.push('M');
+            command.push([points[i].lat, points[i].lng]);
+            command.push('Q');
+        } else {
+            var control = getBezierControlPoint(points[i - 1].lng, points[i - 1].lat, points[i].lng, points[i].lat, 0.2, BezierDirection.OUTSIDE);
+            command.push([control.lat, control.lng]);
+            command.push([points[i].lat, points[i].lng]);
+        }
+    }
+
+    var curve = L.curve(command, {animate: {duration: 3000}}).addTo(map);
+
+
+</script>
+</body>
+</html>

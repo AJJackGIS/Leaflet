@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>移动的marker</title>
+    <link rel="stylesheet" href="../libs/leaflet/leaflet.css">
+    <script src="../libs/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../libs/leaflet/leaflet.js"></script>
+    <script src="../libs/util/markermove.js"></script>
+    <style>
+        html, body, #map{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    var map = L.map('map', {
+        center: [30.445981, 114.438304],
+        zoom: 13
+    });
+    // 添加osm为底图
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    L.marker({lat: 30.44428023295041, lng: 114.43701624870302}).addTo(map).move();
+    setTimeout(function () {
+        L.marker({lat: 30.44428023295041, lng: 114.44711624870302}).addTo(map).move();
+    },1000);
+    setTimeout(function () {
+        L.marker({lat: 30.44428023295041, lng: 114.45721624870302}).addTo(map).move();
+    },2000);
+
+</script>
+</body>
+</html>

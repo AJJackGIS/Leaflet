@@ -24,7 +24,7 @@
 <script>
     var map = L.map('map', {
         center: [30.443161028658903, 114.43944096565248],
-        zoom: 17
+        zoom: 15
     });
     // 添加osm为底图
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -56,7 +56,24 @@
         }
     }
 
-    var curve = L.curve(command, {animate: {duration: 3000}}).addTo(map);
+    var curve = L.curve(command, {
+        color: 'red',
+        fill: false,
+        animate: {duration: 3000, iterations: Infinity}
+    }).addTo(map);
+
+    map.on("zoom", function (event) {
+        map.removeLayer(curve);
+    });
+
+    map.on("zoomend", function (event) {
+        curve = L.curve(command, {
+            color: 'red',
+            fill: false,
+            animate: {duration: 3000, iterations: Infinity}
+        });
+        map.addLayer(curve);
+    });
 
 
 </script>

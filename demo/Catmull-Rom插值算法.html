@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Catmull-Rom插值算法</title>
+    <link rel="stylesheet" href="../libs/leaflet/leaflet.css">
+    <script src="../libs/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../libs/leaflet/leaflet.js"></script>
+    <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    var map = L.map('map').setView([46.05, 11.05], 5);
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png').addTo(map);
+
+
+    /**
+     * Catmull-Rom 插值算法
+     * @param P0 控制点1
+     * @param P1 控制点2
+     * @param P2 控制点3
+     * @param P3 控制点4
+     * @param u 0<u<1
+     * @returns {{lon: number, lat: number}}
+     */
+    function interpolatedPosition(P0, P1, P2, P3, u) {
+        var u3 = u * u * u;
+        var u2 = u * u;
+        var f1 = -0.5 * u3 + u2 - 0.5 * u;
+        var f2 = 1.5 * u3 - 2.5 * u2 + 1.0;
+        var f3 = -1.5 * u3 + 2.0 * u2 + 0.5 * u;
+        var f4 = 0.5 * u3 - 0.5 * u2;
+        var x = P0.lon * f1 + P1.lon * f2 + P2.lon * f3 + P3.lon * f4;
+        var y = P0.lat * f1 + P1.lat * f2 + P2.lat * f3 + P3.lat * f4;
+        return {lon: x, lat: y};
+    }
+
+    var controlPoints = [];
+    // 在指定范围内随机生成若干点
+    for (var i = 0; i < 10; i++) {
+        var x = Math.random() * (114 - 110 + 1) + 110;
+        var y = Math.random() * (35 - 30 + 1) + 30;
+        controlPoints.push({lon: x, lat: y});
+        L.marker(controlPoints[i]).bindPopup(i + '', {autoClose: false}).addTo(map);//.openPopup();
+    }
+
+    // 点集
+    var posisions = [];
+    for (var i = 0; i < controlPoints.length - 1; i++) {
+        // 每个间隔内生成100个插值点
+        if (i == 0) {
+            var PS = {
+                lon: (controlPoints[i].lon + controlPoints[i + 1].lon) / 2,
+                lat: 2 * controlPoints[i].lat - controlPoints[i + 1].lat
+            };
+            for (var ii = 0; ii < 100; ii++) {
+                var point = interpolatedPosition(PS, controlPoints[i], controlPoints[i + 1], controlPoints[i + 2], ii / 100);
+                posisions.push(point);
+            }
+        } else if (i == controlPoints.length - 2) {
+            var PS = {
+                lon: (controlPoints[i + 1].lon + controlPoints[i].lon) / 2,
+                lat: 2 * controlPoints[i + 1].lat - controlPoints[i].lat
+            };
+            for (var ii = 0; ii < 100; ii++) {
+                var point = interpolatedPosition(controlPoints[i - 1], controlPoints[i], controlPoints[i + 1], PS, ii / 100);
+                posisions.push(point);
+            }
+        } else {
+            for (var ii = 0; ii < 100; ii++) {
+                var point = interpolatedPosition(controlPoints[i - 1], controlPoints[i], controlPoints[i + 1], controlPoints[i + 2], ii / 100);
+                posisions.push(point);
+            }
+        }
+    }
+
+    var line = L.polyline(posisions);
+    line.addTo(map);
+
+    map.fitBounds(line.getBounds());
+
+
+</script>
+</body>
+</html>

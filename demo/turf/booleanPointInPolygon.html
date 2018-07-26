@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>点与面位置判断</title>
+    <link rel="stylesheet" href="../../libs/leaflet/leaflet.css">
+    <script src="../../libs/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../../libs/leaflet/leaflet.js"></script>
+    <script src="../../libs/turf/turf.min.js"></script>
+    <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    var map = L.map('map', {
+        center: [30.445981, 114.438304],
+        zoom: 13
+    });
+    // 添加osm为底图
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    var points = [
+        {lat: 30.44139432466169, lng: 114.43782091140748},
+        {lat: 30.44158857117028, lng: 114.44195151329042},
+        {lat: 30.44458546825444, lng: 114.44098591804506},
+        {lat: 30.44428948251910, lng: 114.43693041801454}
+    ];
+    var polygon = L.polygon(points).addTo(map);
+
+    var inPoint = {lat: 30.442929786501193, lng: 114.43989157676698};
+    var outPoint = {lat: 30.443346021990166, lng: 114.44252014160158};
+    var linePoint = {lat: 30.442809540362425, lng: 114.44155454635622};
+
+    L.marker(inPoint).addTo(map).bindPopup(isPointInPolygon(points, inPoint) + "");
+    L.marker(outPoint).addTo(map).bindPopup(isPointInPolygon(points, outPoint) + "");
+    L.marker(linePoint).addTo(map).bindPopup(isPointInPolygon(points, linePoint) + "");
+
+    map.fitBounds(polygon.getBounds());
+
+    function isPointInPolygon(linePoints, point) {
+        var pt = turf.point([point.lng, point.lat]);
+        var points = [];
+        for (var i = 0; i < linePoints.length; i++) {
+            points.push([linePoints[i].lng, linePoints[i].lat]);
+        }
+        points.push([linePoints[0].lng, linePoints[0].lat]);
+        var poly = turf.polygon([points]);
+
+        return turf.booleanPointInPolygon(pt, poly);
+    }
+</script>
+</body>
+</html>

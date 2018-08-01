@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>模板页</title>
+    <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            cursor: default;
+        }
+        .panel{
+            position: absolute;
+            bottom: 0px;
+            z-index: 999;
+            width: 100%;
+            height: 150px;
+            background: #ffffff;
+        }
+        .container{
+            position: relative;
+            width: fit-content;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+            border-radius: 40px;
+            padding: 20px 40px;
+        }
+        .container.in{
+            background:-webkit-gradient(linear, 0 top, right bottom, from(#41a7dc), to(#1296db));
+        }
+        .container.out{
+            background:-webkit-gradient(linear, 0 top, right bottom, from(#10d6cc), to(#11b3d1));
+        }
+        .container img{
+            width: 32px;
+            height: 32px;
+        }
+        .container .split{
+            border: 1px solid #ffffff;
+            height: 30px;
+            margin-left: 10px;
+            display: inline-block;
+            transform: scaleX(.5);
+        }
+        .container span{
+            display: inline-block;
+            margin-left: 10px;
+            color: #fff;
+            font-family: STHeiti;
+        }
+        .container span p{
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+    <link rel="stylesheet" href="../libs/leaflet/leaflet.css">
+    <script src="../libs/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../libs/leaflet/leaflet.js"></script>
+    <script src="../libs/turf/turf.min.js"></script>
+</head>
+<body>
+<div id="map"></div>
+<div class="panel">
+    <div class="container in">
+        <img src="map-pin.png">
+        <div class="split"></div>
+        <span>
+            <p class="state">外勤签到</p>
+            <p class="time">11.27</p>
+        </span>
+    </div>
+</div>
+
+<script>
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////全部为高德GCJ02坐标,如果为WGS84坐标,需提前转换////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // 单位所在地
+    var origin = {lat: 30.44057108516305, lng: 114.44498777389528};
+
+    // 用户所在地
+    var userPlace = [
+        {lat: 30.43801807352744, lng: 114.44753050804138},
+        {lat: 30.438517581063834, lng: 114.44745540618898},
+        {lat: 30.439007835972497, lng: 114.44738030433656},
+        {lat: 30.43925758752542, lng: 114.44733738899232},
+        {lat: 30.439239087432313, lng: 114.44695115089418},
+        {lat: 30.439229837384445, lng: 114.44638252258302},
+        {lat: 30.439229837384445, lng: 114.44565296173097},
+        {lat: 30.439424088205282, lng: 114.44561004638673},
+        {lat: 30.439553588537525, lng: 114.4455671310425},
+        {lat: 30.439858838640095, lng: 114.44547057151796},
+        {lat: 30.43990508857226, lng: 114.44559931755067},
+        {lat: 30.440025338293246, lng: 114.4458568096161}
+    ];
+
+    var map = L.map('map', {
+        zoomControl: false,
+        attributionControl: false,
+        center: userPlace[0],
+        zoom: 16
+    });
+
+    // 加载高德地图
+    L.tileLayer('http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {subdomains: ["1", "2", "3", "4"]}).addTo(map);
+
+    // 标注单位所在地
+    L.marker(origin, {icon: L.icon({iconUrl: 'pin.png', iconSize: [36, 36], iconAnchor: [18, 36]})}).addTo(map);
+
+    // 绘制单位范围
+    L.circle(origin, {radius: 250, stroke: false, fill: true, fillColor: '#000', fillOpacity: 0.2}).addTo(map);
+
+    // 标注设备所在地
+    var marker = L.marker(userPlace[0], {icon: L.icon({iconUrl: 'point.png', iconSize: [24, 24], iconAnchor: [12, 24]})}).addTo(map);
+
+    // 监听用户设备位置改变事件
+    marker.on("move", function (event) {
+        var newPlace = event.latlng;
+        if (booleanEnter([newPlace.lng, newPlace.lat])){
+            $(".container").removeClass("out").addClass("in");
+            $(".state").html("内勤签到");
+        }else{
+            $(".container").removeClass("in").addClass("out");
+            $(".state").html("外勤签到")
+        }
+    });
+
+    // 模拟移动
+    var num = 0;
+    setInterval(function () {
+        marker.setLatLng(userPlace[num++]);
+        if (num == userPlace.length){
+            num = 0;
+        }
+    }, 1000);
+
+    setInterval(function () {
+        var date = new Date();
+        var hour = date.getHours();
+        var minite = date.getMinutes();
+        $(".time").html(hour + ":" + minite);
+    },1000);
+
+    // 范围判断
+    var center = [origin.lng, origin.lat];
+    var radius = 0.25;
+    var circle = turf.circle(center, radius);
+    function booleanEnter(point) {
+        return turf.booleanPointInPolygon(point, circle);
+    }
+
+</script>
+</body>
+</html>

@@ -142,8 +142,8 @@
 
     setInterval(function () {
         var date = new Date();
-        var hour = date.getHours();
-        var minite = date.getMinutes();
+        var hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+        var minite = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
         $(".time").html(hour + ":" + minite);
     },1000);
 

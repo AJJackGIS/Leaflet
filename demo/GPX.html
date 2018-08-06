@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>模板页</title>
+    <link rel="stylesheet" href="../libs/leaflet/leaflet.css">
+    <script src="../libs/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../libs/leaflet/leaflet.js"></script>
+    <script src="../libs/leaflet/gpx.js"></script>
+    <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    var map = L.map('map', {
+        center: [30.445981, 114.438304],
+        zoom: 13
+    });
+    // 添加osm为底图
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    // L.tileLayer('http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}').addTo(map);
+
+    var gpx = 'lushu-761556.gpx'; // URL to your GPX file or the GPX itself
+    new L.GPX(gpx, {
+        async: true,
+        marker_options: {
+            wptIcons: ['track', 'route', 'waypoint']
+        },
+        polyline_options: {
+            color: 'green',
+            opacity: 0.75,
+            weight: 3,
+            lineCap: 'round'
+        }
+    }).on('loaded', function (e) {
+        map.fitBounds(e.target.getBounds());
+    }).addTo(map);
+</script>
+</body>
+</html>

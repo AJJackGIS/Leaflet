@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>-->
+    <!--<meta name="viewport"-->
+          <!--content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>-->
+    <title>车位地图</title>
+    <link rel="stylesheet" href="../libs/leaflet/leaflet.css">
+    <script src="../libs/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../libs/leaflet/leaflet.js"></script>
+    <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            cursor: default;
+            background-color: #F5F5F5;
+        }
+
+        .leaflet-control-attribution {
+            display: none !important;
+        }
+
+        .leaflet-tooltip {
+            opacity: 1 !important;
+            background: none !important;
+            border: 0px !important;
+            box-shadow: none !important;
+        }
+
+        .leaflet-tooltip-top:before,
+        .leaflet-tooltip-bottom:before,
+        .leaflet-tooltip-left:before,
+        .leaflet-tooltip-right:before {
+            border: none !important;
+        }
+
+        .baselayer {
+            color: #999999 !important;
+            font-size: 30px;
+        }
+
+        .parkinglayer {
+            visibility: hidden;
+            color: #999999 !important;
+            font-size: 30px;
+        }
+
+        .my-div-icon {
+            color: #999999 !important;
+            width: 180px !important;
+            font-size: 24px !important;
+        }
+
+
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+  var map = null;
+  var parkingsLayer = null;
+  var parkingcarsLayer = null;
+
+  map = L.map("map", {
+    center: [30.530958148817803, 114.38797521972448],
+    zoom: 16,
+    minZoom: 16
+  });
+
+  map.on("zoomend", function () {
+    if (map.getZoom() >= 19) {
+      $(".parkinglayer").css('visibility', 'visible');
+    } else {
+      $(".parkinglayer").css('visibility', 'hidden');
+    }
+  });
+
+  L.marker([30.524593286963157, 114.37861445162528], {
+    icon: L.divIcon({
+      className: 'my-div-icon',
+      html: '→ 普通车辆入口',
+      iconAnchor: [0, 16]
+    })
+  }).addTo(map);
+
+  L.marker([30.528661251557455, 114.37842417034973], {
+    icon: L.divIcon({
+      className: 'my-div-icon',
+      html: '→ VIP车辆入口',
+      iconAnchor: [0, 18]
+    })
+  }).addTo(map);
+
+  L.marker([30.53425213523085, 114.3786270657654], {
+    icon: L.divIcon({
+      className: 'my-div-icon',
+      html: '← 出口',
+      iconAnchor: [0, 18]
+    })
+  }).addTo(map);
+
+  $.get("data/baseLayerS.geojson", function (data) {
+    L.geoJSON(data, {
+      style: function (feature) {
+        return {
+          stroke: false,
+          fill: true,
+          fillColor: "#DFDFDF",
+          fillOpacity: 1
+        };
+      }
+    }).addTo(map);
+  });
+
+  $.get("data/baseLayer.geojson", function (data) {
+    L.geoJSON(data, {
+      style: function (feature) {
+        return {
+          color: "#DFDFDF",
+          fill: true,
+          fillColor: "#FCFCFC",
+          fillOpacity: 1,
+          weight: 1
+        };
+      },
+      onEachFeature: function (feature, layer) {
+        layer.bindTooltip("<div class='baselayer'><p>" + feature.properties.name + "</p></div>", {
+          permanent: true,
+          direction: 'center',
+          opacity: 1
+        });
+      }
+    }).addTo(map);
+  });
+
+  $.get("data/roadLayer.geojson", function (data) {
+    L.geoJSON(data, {
+      style: function (feature) {
+        return {
+          color: "#C8C8C8",
+          fill: true,
+          fillColor: "#FFF",
+          fillOpacity: 1,
+          weight: 1
+        };
+      }
+    }).addTo(map);
+  });
+
+  $.get("data/pakingLayer.geojson", function (data) {
+    L.geoJSON(data, {
+      style: function (feature) {
+        return {
+          color: "#C8C8C8",
+          fill: true,
+          fillColor: "#FFF",
+          fillOpacity: 1,
+          weight: 1
+        };
+      },
+      onEachFeature: function (feature, layer) {
+        layer.bindTooltip("<div class='parkinglayer'><p>" + feature.properties.name + "</p></div>", {
+          permanent: true,
+          direction: 'center'
+        });
+      }
+    }).addTo(map);
+  });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>加载3857坐标geojson</title>
+    <link rel="stylesheet" href="../libs/leaflet/leaflet.css">
+    <script src="../libs/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../libs/leaflet/leaflet.js"></script>
+    <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    var map = L.map('map', {
+        // center: [49.363093, 120.6657223],
+        center: [30.500473653696, 114.392588138580],
+        zoom: 16
+    });
+    // 添加osm为底图
+    L.tileLayer('http://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}').addTo(map);
+
+    $.get("test1.json", function (data) {
+        L.geoJSON(data,{
+            coordsToLatLng:function (coords) {
+                return L.CRS.EPSG3857.unproject(L.point(coords[0], coords[1]));
+            }
+        }).addTo(map);
+    });
+
+    L.marker([49.394738789155, 120.640684427892]).addTo(map)
+
+</script>
+</body>
+</html>

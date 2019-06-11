@@ -7,7 +7,7 @@
     <script src="../libs/jquery/jquery-3.2.1.min.js"></script>
     <script src="../libs/leaflet/leaflet.js"></script>
     <style>
-        html, body, #map{
+        html, body, #map {
             width: 100%;
             height: 100%;
             margin: 0;
@@ -26,6 +26,11 @@
     });
     // 添加osm为底图
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    // map.on("click", function (event) {
+    //     console.log(event.latlng);
+    // });
+
 </script>
 </body>
 </html>

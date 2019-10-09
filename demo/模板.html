@@ -25,11 +25,27 @@
         zoom: 13
     });
     // 添加osm为底图
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    L.tileLayer('http://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}').addTo(map);
 
     // map.on("click", function (event) {
     //     console.log(event.latlng);
     // });
+
+    fetch("./taifeng.json").then(response => response.json()).then(data =>{
+      data.forEach(route =>{
+        // var color = route.color; // "164,245,140,255";
+        L.polygon(route.latAndLong, {stroke:false,fill: true, fillColor:"rgb(" + route.color + ")", fillOpacity:0.5}).addTo(map);
+      })
+    });
+
+    var maxLat = 43;
+    var maxLng = 160;
+    var minLat = -2;
+    var minLng = 95;
+
+    var imageUrl = './201907310850.png';
+    var imageBounds = [[minLat, minLng], [maxLat, maxLng]];
+    L.imageOverlay(imageUrl, imageBounds).addTo(map);
 
 </script>
 </body>

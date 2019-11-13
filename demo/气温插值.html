@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>气温插值</title>
+    <link rel="stylesheet" href="../libs/leaflet/leaflet.css">
+    <script src="../libs/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../libs/leaflet/leaflet.js"></script>
+    <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    var map = L.map('map', {
+      center: [30.500473653696, 114.392588138580],
+      zoom: 12
+    });
+    // 添加osm为底图
+    L.tileLayer('http://localhost:90/xining2/{z}/{x}/{y}.png', {maxZoom:19}).addTo(map);
+
+    $.get("./data/area.geojson", function (data) {
+      L.geoJSON(data, {
+        style: function (feature) {
+          return {color: getColor(feature.properties.hvalue), fillOpacity:0.8,  weight:1};
+        }
+      }).addTo(map);
+    });
+
+    function bg1(){
+      return '#'+Math.floor(Math.random()*256).toString(10);
+    }
+    // L.marker([49.394738789155, 120.640684427892]).addTo(map)
+
+    function getColor(value) {
+      var color = [
+        {"-30": "#0000ff"},
+        {"-28": "#0014ff"},
+        {"-26": "#0045ff"},
+        {"-24": "#0065ff"},
+        {"-22": "#0085ff"},
+        {"-20": "#00a6ff"},
+        {"-18": "#00cbff"},
+        {"-16": "#00ebff"},
+        {"-14": "#00fff7"},
+        {"-12": "#00ffd6"},
+        {"-10": "#00ffb5"},
+        {"-8": "#00ff94"},
+        {"-6": "#00ff73"},
+        {"-4": "#00ff52"},
+        {"-2": "#00ff29"},
+        {"0": "#00ff08"},
+        {"2": "#10ff00"},
+        {"4": "#31ff00"},
+        {"6": "#52ff00"},
+        {"8": "#73ff00"},
+        {"10": "#94ff00"},
+        {"12": "#b5ff00"},
+        {"14": "#deff00"},
+        {"16": "#ffff00"},
+        {"18": "#ffe700"},
+        {"20": "#ffc300"},
+        {"22": "#ffa200"},
+        {"24": "#ff8200"},
+        {"26": "#ff6100"},
+        {"28": "#ff4100"},
+        {"30": "#ff2c00"},
+        {"32": "#ff2000"},
+        {"34": "#ff1400"},
+        {"100": "#ff0000"}
+      ];
+      for (var i = 0; i < color.length; i++){
+        for(var key in color[i]){
+          if (parseFloat(value) < parseFloat(key)){
+            return color[i][key];
+          }
+        }
+      }
+    }
+
+</script>
+</body>
+</html>
